@@ -2,47 +2,88 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+
 <title>MedievalRPG</title>
 
 <style>
 *{
   box-sizing:border-box;
+  margin:0;
+  padding:0;
   -webkit-tap-highlight-color:transparent;
   user-select:none;
 }
 
 html,body{
-  margin:0;
   width:100%;
   height:100%;
   overflow:hidden;
-  background:#111;
-  font-family:Arial,sans-serif;
+  background:#080808;
+  font-family:monospace;
 }
 
 body{
   display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* TELA DE GIRAR */
+#rotate{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  background:#111;
+  color:white;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  text-align:center;
+}
+
+#rotate .phone{
+  font-size:70px;
+  animation:rot 1.5s infinite alternate;
+}
+
+#rotate h1{
+  color:#e6c46a;
+  margin:15px;
+}
+
+#rotate p{
+  color:#aaa;
+  font-size:16px;
+}
+
+@keyframes rot{
+  from{transform:rotate(0deg)}
+  to{transform:rotate(90deg)}
+}
+
+/* JOGO */
+#gameContainer{
+  position:relative;
+  width:100vw;
+  height:100vh;
+  display:flex;
   justify-content:center;
   align-items:center;
+  background:#111;
 }
 
-#gameWrap{
-  position:relative;
-  width:min(100vw,900px);
-  aspect-ratio:3/2;
-}
-
-canvas{
-  width:100%;
-  height:100%;
-  display:block;
+#game{
+  width:min(100vw,177.77vh);
+  height:min(100vh,56.25vw);
   image-rendering:pixelated;
   image-rendering:crisp-edges;
-  background:#222;
+  background:#000;
+  display:block;
 }
 
-/* CONTROLES DE EMULADOR */
+/* CONTROLES */
 #controls{
   position:absolute;
   inset:0;
@@ -51,144 +92,188 @@ canvas{
 
 #dpad{
   position:absolute;
-  left:4%;
+  left:3%;
   bottom:5%;
-  width:150px;
-  height:150px;
-  pointer-events:auto;
+  width:145px;
+  height:145px;
+  pointer-events:none;
 }
 
 .pad{
   position:absolute;
-  width:52px;
-  height:52px;
-  border:3px solid #777;
+  width:50px;
+  height:50px;
+
+  background:linear-gradient(#555,#242424);
+  border:3px solid #888;
   border-radius:9px;
-  background:linear-gradient(#444,#222);
+
   color:white;
-  font-size:27px;
+  font-size:25px;
   font-weight:bold;
+
   display:flex;
-  align-items:center;
   justify-content:center;
+  align-items:center;
+
   box-shadow:0 5px 0 #111;
+  pointer-events:auto;
   touch-action:none;
 }
 
 .pad:active{
   transform:translateY(4px);
   box-shadow:0 1px 0 #111;
-  background:#666;
+  background:#777;
 }
 
-#up{left:49px;top:0}
-#down{left:49px;bottom:0}
-#left{left:0;top:49px}
-#right{right:0;top:49px}
+#up{
+  left:47px;
+  top:0;
+}
 
-#actionButtons{
+#down{
+  left:47px;
+  bottom:0;
+}
+
+#left{
+  left:0;
+  top:47px;
+}
+
+#right{
+  right:0;
+  top:47px;
+}
+
+/* A B */
+#buttons{
   position:absolute;
   right:4%;
-  bottom:6%;
-  width:145px;
-  height:100px;
-  pointer-events:auto;
+  bottom:5%;
+  width:155px;
+  height:125px;
+  pointer-events:none;
 }
 
 .action{
   position:absolute;
-  width:58px;
-  height:58px;
+  width:67px;
+  height:67px;
+
   border-radius:50%;
-  border:4px solid #777;
+  border:4px solid #888;
   background:linear-gradient(#555,#222);
+
   color:white;
-  font-size:25px;
+  font-size:27px;
   font-weight:bold;
-  box-shadow:0 5px 0 #111;
+
+  box-shadow:0 6px 0 #111;
+  pointer-events:auto;
   touch-action:none;
 }
 
 .action:active{
-  transform:translateY(4px);
+  transform:translateY(5px);
   box-shadow:0 1px 0 #111;
 }
 
-#btnA{
+#A{
   right:0;
-  top:5px;
+  top:0;
 }
 
-#btnB{
-  left:5px;
+#B{
+  left:0;
   bottom:0;
 }
 
-/* BOTÕES EXTRAS */
-#extraButtons{
+/* INVENTÁRIO */
+#I{
   position:absolute;
   right:4%;
   top:5%;
-  display:flex;
-  gap:8px;
-  pointer-events:auto;
-}
 
-.extra{
-  border:2px solid #777;
+  width:48px;
+  height:42px;
+
+  border:3px solid #777;
+  border-radius:8px;
   background:#222;
   color:white;
-  padding:7px 10px;
-  border-radius:7px;
+
+  font-size:20px;
   font-weight:bold;
+
+  pointer-events:auto;
   touch-action:none;
 }
 
-/* ESCONDE CONTROLES NO MENU */
-.hideControls{
+.hidden{
   display:none!important;
+}
+
+@media (orientation:portrait){
+  #rotate{
+    display:flex;
+  }
+
+  #gameContainer{
+    display:none;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<div id="gameWrap">
+<div id="rotate">
+  <div class="phone">📱</div>
+  <h1>VIRE O CELULAR DE LADO</h1>
+  <p>MedievalRPG foi feito para jogar na horizontal.</p>
+</div>
 
-<canvas id="game" width="480" height="320"></canvas>
+<div id="gameContainer">
+
+<canvas id="game" width="480" height="270"></canvas>
 
 <div id="controls">
 
   <div id="dpad">
-    <div class="pad" id="up">▲</div>
-    <div class="pad" id="down">▼</div>
-    <div class="pad" id="left">◀</div>
-    <div class="pad" id="right">▶</div>
+    <button class="pad" id="up">▲</button>
+    <button class="pad" id="down">▼</button>
+    <button class="pad" id="left">◀</button>
+    <button class="pad" id="right">▶</button>
   </div>
 
-  <div id="actionButtons">
-    <button class="action" id="btnA">A</button>
-    <button class="action" id="btnB">B</button>
+  <div id="buttons">
+    <button class="action" id="A">A</button>
+    <button class="action" id="B">B</button>
   </div>
 
-  <div id="extraButtons">
-    <button class="extra" id="inventoryBtn">I</button>
-  </div>
+  <button id="I">I</button>
 
 </div>
 
 </div>
 
 <script>
+"use strict";
+
 const canvas=document.getElementById("game");
 const ctx=canvas.getContext("2d");
 
 ctx.imageSmoothingEnabled=false;
 
 const W=480;
-const H=320;
+const H=270;
 
 let state="menu";
+let currentMission=0;
+let message="";
+let messageTimer=0;
 
 const keys={
   up:false,
@@ -197,350 +282,628 @@ const keys={
   right:false
 };
 
-let player={
+/* =========================
+   JOGADOR
+========================= */
+
+const player={
   x:240,
-  y:180,
-  speed:2,
+  y:150,
+
   hp:100,
   maxHp:100,
-  mana:30,
-  maxMana:30,
+
+  mana:40,
+  maxMana:40,
+
   level:1,
   xp:0,
   nextXP:40,
+
   attack:12,
   defense:4,
+
   gold:30,
   potions:3,
-  sword:0,
+
+  missionKills:0,
+
+  weapon:0,
   armor:0
 };
 
-let enemies=[
-  {x:120,y:100,type:"Goblin",hp:35,maxHp:35,attack:7,xp:15,gold:8},
-  {x:360,y:90,type:"Lobo",hp:30,maxHp:30,attack:8,xp:13,gold:6},
-  {x:150,y:260,type:"Bandido",hp:50,maxHp:50,attack:10,xp:22,gold:15},
-  {x:390,y:245,type:"Orc",hp:80,maxHp:80,attack:14,xp:35,gold:25}
+/* =========================
+   MISSÕES
+========================= */
+
+const missions=[
+  {
+    title:"Os Goblins",
+    text:"Derrote 3 goblins.",
+    target:3,
+    rewardXP:40,
+    rewardGold:30
+  },
+  {
+    title:"Lobos da floresta",
+    text:"Derrote 4 lobos.",
+    target:4,
+    rewardXP:60,
+    rewardGold:45
+  },
+  {
+    title:"O Bandido",
+    text:"Derrote 2 bandidos.",
+    target:2,
+    rewardXP:80,
+    rewardGold:60
+  },
+  {
+    title:"O Orc",
+    text:"Derrote 1 Orc.",
+    target:1,
+    rewardXP:120,
+    rewardGold:100
+  }
 ];
 
-let enemy=null;
-let message="";
+/* =========================
+   INIMIGOS
+========================= */
 
-function rect(x,y,w,h,c){
-  ctx.fillStyle=c;
+let enemies=[];
+
+function createEnemies(){
+
+  enemies=[
+    {
+      x:120,y:100,
+      type:"Goblin",
+      hp:35,maxHp:35,
+      attack:7,
+      xp:15,gold:8,
+      color:"#4c9a45"
+    },
+
+    {
+      x:165,y:215,
+      type:"Goblin",
+      hp:35,maxHp:35,
+      attack:7,
+      xp:15,gold:8,
+      color:"#4c9a45"
+    },
+
+    {
+      x:340,y:100,
+      type:"Goblin",
+      hp:35,maxHp:35,
+      attack:7,
+      xp:15,gold:8,
+      color:"#4c9a45"
+    },
+
+    {
+      x:390,y:210,
+      type:"Lobo",
+      hp:30,maxHp:30,
+      attack:8,
+      xp:13,gold:6,
+      color:"#777"
+    },
+
+    {
+      x:315,y:220,
+      type:"Lobo",
+      hp:30,maxHp:30,
+      attack:8,
+      xp:13,gold:6,
+      color:"#777"
+    },
+
+    {
+      x:80,y:225,
+      type:"Bandido",
+      hp:50,maxHp:50,
+      attack:10,
+      xp:22,gold:15,
+      color:"#78482e"
+    },
+
+    {
+      x:420,y:70,
+      type:"Orc",
+      hp:80,maxHp:80,
+      attack:14,
+      xp:35,gold:25,
+      color:"#315f37"
+    }
+  ];
+}
+
+createEnemies();
+
+let enemy=null;
+
+/* =========================
+   DESENHO
+========================= */
+
+function rect(x,y,w,h,color){
+  ctx.fillStyle=color;
   ctx.fillRect(Math.floor(x),Math.floor(y),w,h);
 }
 
-function text(t,x,y,size=12,c="#fff"){
-  ctx.fillStyle=c;
+function txt(t,x,y,size=10,color="#fff"){
+  ctx.fillStyle=color;
   ctx.font=size+"px monospace";
   ctx.fillText(t,x,y);
 }
 
-function bar(x,y,w,h,value,max,color){
-  rect(x,y,w,h,"#222");
-  rect(x,y,w*Math.max(0,value/max),h,color);
+function hpBar(x,y,w,h,value,max,color){
+  rect(x,y,w,h,"#111");
+  rect(
+    x,
+    y,
+    Math.max(0,w*(value/max)),
+    h,
+    color
+  );
+
   ctx.strokeStyle="#000";
   ctx.strokeRect(x,y,w,h);
 }
 
+/* =========================
+   MENU
+========================= */
+
 function drawMenu(){
+
   rect(0,0,W,H,"#111");
 
-  text("MEDIEVAL RPG",105,80,30,"#e8c46a");
-  text("PIXEL ADVENTURE",145,105,12,"#aaa");
+  /* lua */
+  ctx.fillStyle="#e7d99a";
+  ctx.beginPath();
+  ctx.arc(390,55,22,0,Math.PI*2);
+  ctx.fill();
 
-  rect(140,145,200,48,"#292929");
-  text("A - JOGAR",185,175,18,"#fff");
+  /* castelo */
+  rect(50,90,380,110,"#333");
 
-  text("Controles",190,225,13,"#e8c46a");
-  text("D-PAD = MOVER",155,245,11,"#aaa");
-  text("A = AÇÃO / B = VOLTAR",125,263,11,"#aaa");
+  rect(80,55,55,145,"#3e3e3e");
+  rect(345,55,55,145,"#3e3e3e");
 
-  text("Toque em A para começar",140,295,11,"#777");
+  rect(190,120,100,80,"#292929");
+
+  txt("MEDIEVAL RPG",135,45,27,"#e6c46a");
+  txt("MEDIEVALRPG",181,63,10,"#aaa");
+
+  rect(175,215,130,35,"#4b3420");
+  txt("A  JOGAR",204,238,15,"#fff");
+
+  txt("RPG PIXEL • SINGLE PLAYER",145,260,9,"#aaa");
 }
 
+/* =========================
+   MAPA
+========================= */
+
 function drawWorld(){
-  rect(0,0,W,H,"#4c8a3d");
+
+  /* grama */
+  rect(0,0,W,H,"#3d7938");
 
   /* água */
-  rect(0,0,480,38,"#3478a8");
-  for(let x=0;x<480;x+=24){
-    rect(x,15,14,2,"#65a9cf");
+  rect(0,0,W,35,"#28648e");
+
+  for(let x=0;x<W;x+=28){
+    rect(x,12,15,2,"#5da4c5");
   }
 
   /* estrada */
-  rect(0,145,480,55,"#b69b6d");
-  rect(215,38,50,107,"#b69b6d");
-  rect(215,200,50,120,"#b69b6d");
+  rect(0,125,W,42,"#a8875d");
+  rect(225,35,35,90,"#a8875d");
+  rect(225,167,35,103,"#a8875d");
+
+  /* ponte */
+  rect(210,0,70,35,"#704728");
+
+  for(let x=215;x<280;x+=12){
+    rect(x,0,6,35,"#956238");
+  }
 
   /* vila */
-  rect(25,65,70,55,"#9c5c35");
-  rect(32,58,56,15,"#69391f");
-  rect(48,88,20,32,"#49301f");
+  rect(25,65,75,60,"#8e5530");
+  rect(20,55,85,18,"#63381f");
+
+  rect(53,88,20,37,"#472b20");
+
+  /* janelas */
+  rect(35,80,12,12,"#e3bf62");
+  rect(76,80,12,12,"#e3bf62");
 
   /* castelo */
-  rect(355,45,95,80,"#777");
-  rect(365,30,20,95,"#666");
-  rect(420,30,20,95,"#666");
-  rect(350,30,110,15,"#555");
-  rect(390,85,25,40,"#382a24);
+  rect(355,45,90,80,"#707070");
+
+  rect(350,30,25,95,"#5b5b5b");
+  rect(425,30,25,95,"#5b5b5b");
+
+  rect(345,28,85,14,"#444");
+
+  rect(387,83,25,42,"#30241f");
 
   /* árvores */
   const trees=[
-    [30,220],[70,250],[105,215],
-    [315,225],[350,270],[440,205]
+    [20,180],
+    [55,215],
+    [110,180],
+    [285,55],
+    [300,180],
+    [440,155],
+    [430,220]
   ];
 
-  for(const [x,y] of trees){
-    rect(x+8,y+18,8,22,"#654321");
-    rect(x,y,25,25,"#1f632f");
-    rect(x+5,y-7,18,18,"#28753a");
+  for(const t of trees){
+
+    const x=t[0];
+    const y=t[1];
+
+    rect(x+9,y+17,8,22,"#5a371f");
+
+    rect(x,y,27,27,"#205b2e");
+    rect(x+5,y-8,18,18,"#2b7139");
+    rect(x+10,y-13,9,10,"#398849");
   }
+
+  /* NPC */
+  rect(75,145,12,20,"#263b9b");
+  rect(77,137,9,9,"#d49a6b");
+  txt("Mestre",60,135,7,"#fff");
 
   /* inimigos */
   for(const e of enemies){
+
     if(e.hp<=0) continue;
 
-    rect(e.x-8,e.y-8,16,16,"#b22");
-    rect(e.x-6,e.y-12,12,5,"#822");
-    rect(e.x-5,e.y-3,3,3,"#fff");
-    rect(e.x+2,e.y-3,3,3,"#fff");
-
-    text(e.type,e.x-22,e.y-17,7,"#fff");
+    drawEnemy(e);
   }
 
   /* jogador */
-  rect(player.x-7,player.y-10,14,18,"#234b9b");
-  rect(player.x-6,player.y-17,12,8,"#e3ad78");
-  rect(player.x-9,player.y-20,18,5,"#777");
-  rect(player.x-12,player.y-25,24,6,"#555");
+  drawWarrior(player.x,player.y);
 
   /* HUD */
-  rect(5,5,175,58,"rgba(0,0,0,.7)");
-  text("Nível "+player.level,12,18,10,"#fff");
-  text("HP",12,32,9,"#fff");
-  bar(35,25,90,8,player.hp,player.maxHp,"#d33");
+  rect(5,5,185,55,"rgba(0,0,0,.75)");
 
-  text("MP",12,47,9,"#fff");
-  bar(35,40,90,8,player.mana,player.maxMana,"#3488dd");
+  txt("NÍVEL "+player.level,12,17,10,"#e6c46a");
 
-  text("🪙 "+player.gold,130,32,10,"#ffd34d");
-  text("XP "+player.xp+"/"+player.nextXP,130,48,9,"#fff");
+  txt("HP",12,32,8);
+  hpBar(32,25,70,7,player.hp,player.maxHp,"#d33");
 
-  text("I = Inventário",7,313,9,"#fff");
-  text("L = Loja",405,313,9,"#fff");
-}
+  txt("MP",12,46,8);
+  hpBar(32,39,70,7,player.mana,player.maxMana,"#3186d8");
 
-function drawBattle(){
-  rect(0,0,W,H,"#182033");
+  txt("🪙 "+player.gold,115,31,10,"#ffd447");
 
-  text("BATALHA",185,35,22,"#e8c46a");
-
-  /* jogador */
-  rect(90,155,45,55,"#234b9b");
-  rect(100,137,25,22,"#e3ad78");
-  rect(94,132,37,8,"#666");
-  text("HERÓI",85,230,11,"#fff");
-
-  /* inimigo */
-  rect(350,145,45,55,"#a52b2b");
-  rect(355,125,35,25,"#782020");
-  rect(347,118,50,10,"#541616");
-  text(enemy.type,335,230,11,"#fff");
-
-  text("HP",75,250,10,"#fff");
-  bar(100,242,100,10,player.hp,player.maxHp,"#d33");
-
-  text("HP",315,250,10,"#fff");
-  bar(340,242,100,10,enemy.hp,enemy.maxHp,"#d33");
-
-  rect(55,270,370,38,"#222");
-
-  text("A = ATACAR",70,293,11,"#fff");
-  text("B = POÇÃO",190,293,11,"#6bd");
-  text("2 = ESPECIAL",310,293,10,"#f8d35b");
-
-  if(message){
-    rect(90,70,300,35,"#111");
-    text(message,110,92,11,"#fff");
-  }
-}
-
-function drawInventory(){
-  drawWorld();
-
-  rect(55,45,370,230,"#171717");
-  ctx.strokeStyle="#d6b35d";
-  ctx.strokeRect(55,45,370,230);
-
-  text("INVENTÁRIO",155,72,22,"#e8c46a");
-
-  text("Nível: "+player.level,80,105);
-  text("HP: "+player.hp+"/"+player.maxHp,80,125);
-  text("Mana: "+player.mana+"/"+player.maxMana,80,145);
-  text("Ataque: "+player.attack,80,165);
-  text("Defesa: "+player.defense,80,185);
-  text("Poções: "+player.potions,80,205);
-  text("Ouro: "+player.gold,80,225);
-
-  text("B = VOLTAR",315,255,11,"#aaa");
-}
-
-function drawShop(){
-  drawWorld();
-
-  rect(60,45,360,230,"#171717");
-  ctx.strokeStyle="#d6b35d";
-  ctx.strokeRect(60,45,360,230);
-
-  text("LOJA",190,72,22,"#e8c46a");
-
-  text("A = Poção   15 ouro",90,115,13);
-  text("1 = Espada  80 ouro",90,145,13);
-  text("2 = Armadura 70 ouro",90,175,13);
-
-  text("Ouro: "+player.gold,90,215,13,"#ffd34d");
-  text("B = VOLTAR",315,255,11,"#aaa");
-}
-
-function startGame(){
-  state="world";
-  message="";
-}
-
-function attack(){
-  if(state==="menu"){
-    startGame();
-    return;
-  }
-
-  if(state==="battle"){
-    const damage=Math.max(1,player.attack-Math.floor(Math.random()*4));
-    enemy.hp-=damage;
-    message="Você causou "+damage+" de dano!";
-
-    if(enemy.hp<=0){
-      player.xp+=enemy.xp;
-      player.gold+=enemy.gold;
-      message="Vitória! +"+enemy.xp+" XP";
-
-      checkLevel();
-      state="world";
-      enemy=null;
-      save();
-      return;
-    }
-
-    enemyAttack();
-  }
-}
-
-function special(){
-  if(state!=="battle") return;
-
-  if(player.mana<10){
-    message="Mana insuficiente!";
-    return;
-  }
-
-  player.mana-=10;
-
-  const damage=player.attack+10;
-  enemy.hp-=damage;
-
-  message="Golpe especial! "+damage+" de dano!";
-
-  if(enemy.hp<=0){
-    player.xp+=enemy.xp;
-    player.gold+=enemy.gold;
-    checkLevel();
-    state="world";
-    enemy=null;
-    save();
-    return;
-  }
-
-  enemyAttack();
-}
-
-function usePotion(){
-  if(state==="battle"){
-    if(player.potions<=0){
-      message="Sem poções!";
-      return;
-    }
-
-    player.potions--;
-    player.hp=Math.min(player.maxHp,player.hp+35);
-    message="Você recuperou 35 HP!";
-    enemyAttack();
-  }
-}
-
-function enemyAttack(){
-  if(!enemy) return;
-
-  const damage=Math.max(
-    1,
-    enemy.attack-player.defense+Math.floor(Math.random()*3)
+  txt(
+    "XP "+player.xp+"/"+player.nextXP,
+    115,47,8
   );
 
-  player.hp-=damage;
+  /* missão */
+  const m=missions[currentMission];
 
-  if(player.hp<=0){
-    player.hp=player.maxHp;
-    player.mana=player.maxMana;
-    player.gold=Math.floor(player.gold/2);
-    state="world";
-    enemy=null;
-    message="Você foi derrotado!";
-    save();
+  rect(195,5,280,55,"rgba(0,0,0,.75)");
+
+  txt("MISSÃO: "+m.title,203,18,10,"#e6c46a");
+
+  txt(m.text,203,34,8,"#fff");
+
+  txt(
+    "Progresso: "+
+    Math.min(player.missionKills,m.target)+
+    "/"+m.target,
+    203,49,8,"#aaa"
+  );
+}
+
+/* =========================
+   GUERREIRO PIXEL
+========================= */
+
+function drawWarrior(x,y){
+
+  /* sombra */
+  rect(x-9,y+10,18,4,"#245126");
+
+  /* pernas */
+  rect(x-7,y+4,5,9,"#302d35");
+  rect(x+2,y+4,5,9,"#302d35");
+
+  /* botas */
+  rect(x-8,y+11,7,4,"#1d1b1b");
+  rect(x+1,y+11,8,4,"#1d1b1b");
+
+  /* corpo */
+  rect(x-8,y-8,16,14,"#234d91");
+
+  /* armadura */
+  rect(x-7,y-7,14,9,"#777");
+  rect(x-5,y-6,10,3,"#a7a7a7");
+
+  /* cabeça */
+  rect(x-7,y-19,14,12,"#c58b61");
+
+  /* cabelo */
+  rect(x-8,y-21,16,6,"#30251d");
+
+  /* capacete */
+  rect(x-10,y-24,20,5,"#777");
+  rect(x-7,y-27,14,4,"#555");
+
+  /* olhos */
+  rect(x-4,y-15,2,2,"#111");
+  rect(x+2,y-15,2,2,"#111");
+
+  /* espada */
+  rect(x+10,y-5,3,17,"#c9c9c9");
+  rect(x+7,y-2,9,3,"#7c4d27");
+}
+
+/* =========================
+   INIMIGOS
+========================= */
+
+function drawEnemy(e){
+
+  const x=e.x;
+  const y=e.y;
+
+  /* sombra */
+  rect(x-9,y+9,18,4,"#245126");
+
+  if(e.type==="Lobo"){
+
+    rect(x-11,y-4,22,12,e.color);
+    rect(x-8,y-11,15,10,e.color);
+
+    rect(x-8,y-14,5,6,e.color);
+    rect(x+3,y-14,5,6,e.color);
+
+    rect(x-5,y-7,3,3,"#fff");
+    rect(x+3,y-7,3,3,"#fff");
+
+  }else{
+
+    /* corpo */
+    rect(x-8,y-5,16,16,e.color);
+
+    /* cabeça */
+    rect(x-9,y-17,18,13,e.color);
+
+    /* orelhas */
+    rect(x-10,y-21,6,7,e.color);
+    rect(x+4,y-21,6,7,e.color);
+
+    /* olhos */
+    rect(x-5,y-12,3,3,"#ffef55");
+    rect(x+2,y-12,3,3,"#ffef55");
+  }
+
+  hpBar(
+    x-18,
+    y-29,
+    36,
+    4,
+    e.hp,
+    e.maxHp,
+    "#d33"
+  );
+
+  txt(e.type,x-20,y-34,6,"#fff");
+}
+
+/* =========================
+   BATALHA
+========================= */
+
+function drawBattle(){
+
+  rect(0,0,W,H,"#171c29");
+
+  /* chão */
+  rect(0,190,W,80,"#343b2d");
+
+  txt("BATALHA",190,25,20,"#e6c46a");
+
+  /* jogador grande */
+  drawWarrior(110,155);
+
+  /* inimigo */
+  drawEnemyBattle(enemy);
+
+  txt("GUERREIRO",75,210,8,"#fff");
+  txt(enemy.type.toUpperCase(),330,210,8,"#fff");
+
+  hpBar(
+    50,220,120,10,
+    player.hp,
+    player.maxHp,
+    "#d33"
+  );
+
+  hpBar(
+    310,220,120,10,
+    enemy.hp,
+    enemy.maxHp,
+    "#d33"
+  );
+
+  /* caixa */
+  rect(70,235,340,30,"#111");
+
+  txt(
+    "A ATAQUE",
+    85,254,9,"#fff"
+  );
+
+  txt(
+    "B POÇÃO",
+    190,254,9,"#65aee8"
+  );
+
+  txt(
+    "ESPECIAL",
+    305,254,9,"#e6c46a"
+  );
+
+  if(messageTimer>0){
+    rect(110,45,260,30,"#111");
+    txt(message,125,65,8,"#fff");
   }
 }
 
-function checkLevel(){
-  while(player.xp>=player.nextXP){
-    player.xp-=player.nextXP;
-    player.level++;
-    player.nextXP=Math.floor(player.nextXP*1.5);
-    player.maxHp+=15;
-    player.hp=player.maxHp;
-    player.maxMana+=5;
-    player.mana=player.maxMana;
-    player.attack+=3;
-    player.defense+=1;
-  }
+function drawEnemyBattle(e){
+
+  const x=365;
+  const y=155;
+
+  rect(x-22,y+5,44,45,e.color);
+  rect(x-27,y-25,54,32,e.color);
+
+  rect(x-30,y-30,10,12,e.color);
+  rect(x+20,y-30,10,12,e.color);
+
+  rect(x-15,y-15,5,5,"#ffef55");
+  rect(x+10,y-15,5,5,"#ffef55");
 }
 
-function move(){
+/* =========================
+   INVENTÁRIO
+========================= */
+
+function drawInventory(){
+
+  drawWorld();
+
+  rect(65,40,350,200,"#151515");
+
+  ctx.strokeStyle="#d6b35d";
+  ctx.strokeRect(65,40,350,200);
+
+  txt("INVENTÁRIO",170,65,18,"#e6c46a");
+
+  txt("⚔ Ataque: "+player.attack,90,95,11);
+  txt("🛡 Defesa: "+player.defense,90,115,11);
+  txt("❤️ Vida: "+player.hp+"/"+player.maxHp,90,135,11);
+  txt("💧 Mana: "+player.mana+"/"+player.maxMana,90,155,11);
+  txt("🧪 Poções: "+player.potions,90,175,11);
+  txt("🪙 Ouro: "+player.gold,90,195,11);
+
+  txt("B = VOLTAR",310,225,8,"#aaa");
+}
+
+/* =========================
+   MISSÕES
+========================= */
+
+function drawMission(){
+
+  drawWorld();
+
+  rect(65,50,350,170,"#151515");
+
+  ctx.strokeStyle="#d6b35d";
+  ctx.strokeRect(65,50,350,170);
+
+  const m=missions[currentMission];
+
+  txt("MISSÃO",190,75,18,"#e6c46a");
+  txt(m.title,150,105,14,"#fff");
+  txt(m.text,125,130,10,"#aaa");
+
+  txt(
+    "Progresso: "+
+    player.missionKills+
+    "/"+
+    m.target,
+    165,160,11
+  );
+
+  txt(
+    "Recompensa: "+m.rewardXP+" XP",
+    135,180,9,"#65aee8"
+  );
+
+  txt(
+    "A = continuar",
+    170,205,9,"#aaa"
+  );
+}
+
+/* =========================
+   LOJA
+========================= */
+
+function drawShop(){
+
+  drawWorld();
+
+  rect(65,40,350,200,"#151515");
+
+  ctx.strokeStyle="#d6b35d";
+  ctx.strokeRect(65,40,350,200);
+
+  txt("LOJA DO VILAREJO",130,68,17,"#e6c46a");
+
+  txt("A = Poção       15 🪙",95,105,10);
+  txt("1 = Espada      80 🪙",95,135,10);
+  txt("2 = Armadura    70 🪙",95,165,10);
+
+  txt("Ouro: "+player.gold,95,200,11,"#ffd447");
+
+  txt("B = sair",330,225,8,"#aaa");
+}
+
+/* =========================
+   GAMEPLAY
+========================= */
+
+function movePlayer(){
+
   if(state!=="world") return;
 
   let dx=0;
   let dy=0;
 
-  if(keys.left) dx-=1;
-  if(keys.right) dx+=1;
-  if(keys.up) dy-=1;
-  if(keys.down) dy+=1;
+  if(keys.left) dx--;
+  if(keys.right) dx++;
+  if(keys.up) dy--;
+  if(keys.down) dy++;
 
   if(dx!==0 && dy!==0){
     dx*=0.7;
     dy*=0.7;
   }
 
-  player.x+=dx*player.speed;
-  player.y+=dy*player.speed;
+  player.x+=dx*2;
+  player.y+=dy*2;
 
-  player.x=Math.max(10,Math.min(W-10,player.x));
-  player.y=Math.max(45,Math.min(H-15,player.y));
+  player.x=Math.max(12,Math.min(W-12,player.x));
+  player.y=Math.max(45,Math.min(H-12,player.y));
 
+  /* colisão com inimigo */
   for(const e of enemies){
+
     if(e.hp<=0) continue;
 
-    const d=Math.hypot(player.x-e.x,player.y-e.y);
+    const distance=Math.hypot(
+      player.x-e.x,
+      player.y-e.y
+    );
 
-    if(d<20){
+    if(distance<20){
+
       enemy=e;
       state="battle";
       message="";
@@ -549,155 +912,524 @@ function move(){
   }
 }
 
-function save(){
-  localStorage.setItem("MedievalRPG_Save",JSON.stringify(player));
-}
+/* =========================
+   ATAQUE
+========================= */
 
-function openInventory(){
-  if(state==="world") state="inventory";
-}
+function attack(){
 
-function closeScreen(){
-  if(state==="inventory" || state==="shop"){
+  if(state==="menu"){
+    state="world";
+    return;
+  }
+
+  if(state==="battle"){
+
+    const damage=
+      Math.max(
+        1,
+        player.attack-
+        Math.floor(Math.random()*4)
+      );
+
+    enemy.hp-=damage;
+
+    showMessage(
+      "Você causou "+damage+" de dano!"
+    );
+
+    if(enemy.hp<=0){
+
+      winBattle();
+
+      return;
+    }
+
+    enemyAttack();
+  }
+
+  else if(state==="mission"){
+
     state="world";
   }
+
+  else if(state==="shop"){
+
+    buyPotion();
+  }
 }
 
-function shopAction(n){
+function specialAttack(){
+
+  if(state!=="battle") return;
+
+  if(player.mana<10){
+
+    showMessage("Mana insuficiente!");
+
+    return;
+  }
+
+  player.mana-=10;
+
+  const damage=player.attack+12;
+
+  enemy.hp-=damage;
+
+  showMessage(
+    "GOLPE ESPECIAL! "+damage+"!"
+  );
+
+  if(enemy.hp<=0){
+
+    winBattle();
+
+    return;
+  }
+
+  enemyAttack();
+}
+
+function usePotion(){
+
+  if(state!=="battle") return;
+
+  if(player.potions<=0){
+
+    showMessage("Sem poções!");
+
+    return;
+  }
+
+  player.potions--;
+
+  player.hp=Math.min(
+    player.maxHp,
+    player.hp+35
+  );
+
+  showMessage("Você recuperou 35 HP!");
+
+  enemyAttack();
+}
+
+/* =========================
+   BATALHA VENCIDA
+========================= */
+
+function winBattle(){
+
+  player.xp+=enemy.xp;
+  player.gold+=enemy.gold;
+
+  /* missão */
+  if(
+    enemy.type==="Goblin" &&
+    currentMission===0
+  ){
+    player.missionKills++;
+  }
+
+  if(
+    enemy.type==="Lobo" &&
+    currentMission===1
+  ){
+    player.missionKills++;
+  }
+
+  if(
+    enemy.type==="Bandido" &&
+    currentMission===2
+  ){
+    player.missionKills++;
+  }
+
+  if(
+    enemy.type==="Orc" &&
+    currentMission===3
+  ){
+    player.missionKills++;
+  }
+
+  enemy.hp=0;
+
+  checkLevel();
+
+  checkMission();
+
+  showMessage("VITÓRIA!");
+
+  state="world";
+
+  saveGame();
+}
+
+/* =========================
+   INIMIGO ATACA
+========================= */
+
+function enemyAttack(){
+
+  if(!enemy) return;
+
+  const damage=Math.max(
+    1,
+    enemy.attack-
+    player.defense+
+    Math.floor(Math.random()*3)
+  );
+
+  player.hp-=damage;
+
+  if(player.hp<=0){
+
+    player.hp=player.maxHp;
+    player.mana=player.maxMana;
+
+    player.gold=Math.floor(
+      player.gold/2
+    );
+
+    showMessage(
+      "Você foi derrotado!"
+    );
+
+    state="world";
+
+    enemy=null;
+
+    saveGame();
+  }
+}
+
+/* =========================
+   LEVEL UP
+========================= */
+
+function checkLevel(){
+
+  while(player.xp>=player.nextXP){
+
+    player.xp-=player.nextXP;
+
+    player.level++;
+
+    player.nextXP=
+      Math.floor(
+        player.nextXP*1.5
+      );
+
+    player.maxHp+=15;
+    player.hp=player.maxHp;
+
+    player.maxMana+=5;
+    player.mana=player.maxMana;
+
+    player.attack+=3;
+    player.defense+=1;
+  }
+}
+
+/* =========================
+   MISSÃO COMPLETA
+========================= */
+
+function checkMission(){
+
+  const m=missions[currentMission];
+
+  if(player.missionKills>=m.target){
+
+    player.xp+=m.rewardXP;
+    player.gold+=m.rewardGold;
+
+    player.missionKills=0;
+
+    if(currentMission<missions.length-1){
+
+      currentMission++;
+    }
+
+    checkLevel();
+
+    showMessage(
+      "MISSÃO COMPLETA!"
+    );
+  }
+}
+
+/* =========================
+   LOJA
+========================= */
+
+function buyPotion(){
+
   if(state!=="shop") return;
 
-  if(n===0){
-    if(player.gold>=15){
-      player.gold-=15;
-      player.potions++;
-    }
-  }
+  if(player.gold>=15){
 
-  if(n===1){
-    if(player.gold>=80){
-      player.gold-=80;
-      player.attack+=5;
-      player.sword++;
-    }
-  }
+    player.gold-=15;
+    player.potions++;
 
-  if(n===2){
-    if(player.gold>=70){
-      player.gold-=70;
-      player.defense+=4;
-      player.armor++;
-    }
+    saveGame();
   }
-
-  save();
 }
 
-function gameLoop(){
-  move();
+/* =========================
+   MENSAGEM
+========================= */
 
-  if(state==="menu") drawMenu();
-  else if(state==="world") drawWorld();
-  else if(state==="battle") drawBattle();
-  else if(state==="inventory") drawInventory();
-  else if(state==="shop") drawShop();
+function showMessage(t){
 
-  document.getElementById("controls")
-    .classList.toggle("hideControls",state==="menu");
-
-  requestAnimationFrame(gameLoop);
+  message=t;
+  messageTimer=120;
 }
 
-/* TECLADO */
-document.addEventListener("keydown",e=>{
-  if(e.key==="ArrowUp" || e.key.toLowerCase()==="w") keys.up=true;
-  if(e.key==="ArrowDown" || e.key.toLowerCase()==="s") keys.down=true;
-  if(e.key==="ArrowLeft" || e.key.toLowerCase()==="a") keys.left=true;
-  if(e.key==="ArrowRight" || e.key.toLowerCase()==="d") keys.right=true;
+/* =========================
+   SAVE
+========================= */
 
-  if(e.key==="Enter" && state==="menu") startGame();
+function saveGame(){
 
-  if(e.key.toLowerCase()==="i") openInventory();
+  const data={
+    player:player,
+    mission:currentMission
+  };
 
-  if(e.key==="Escape") closeScreen();
+  localStorage.setItem(
+    "MedievalRPG_Save",
+    JSON.stringify(data)
+  );
+}
 
-  if(e.key==="1"){
-    if(state==="battle") attack();
-    if(state==="shop") shopAction(1);
-  }
+/* =========================
+   LOAD
+========================= */
 
-  if(e.key==="2"){
-    if(state==="battle") special();
-    if(state==="shop") shopAction(2);
-  }
+function loadGame(){
 
-  if(e.key==="3" && state==="battle") usePotion();
+  try{
 
-  if(e.key.toLowerCase()==="l" && state==="world"){
-    state="shop";
-  }
-});
+    const data=
+      JSON.parse(
+        localStorage.getItem(
+          "MedievalRPG_Save"
+        )
+      );
 
-document.addEventListener("keyup",e=>{
-  if(e.key==="ArrowUp" || e.key.toLowerCase()==="w") keys.up=false;
-  if(e.key==="ArrowDown" || e.key.toLowerCase()==="s") keys.down=false;
-  if(e.key==="ArrowLeft" || e.key.toLowerCase()==="a") keys.left=false;
-  if(e.key==="ArrowRight" || e.key.toLowerCase()==="d") keys.right=false;
-});
+    if(!data) return;
 
-/* D-PAD */
-function holdButton(id,key){
-  const el=document.getElementById(id);
+    Object.assign(
+      player,
+      data.player
+    );
 
-  const on=ev=>{
-    ev.preventDefault();
+    currentMission=
+      data.mission||0;
+
+  }catch(e){}
+}
+
+/* =========================
+   BOTÕES
+========================= */
+
+function hold(id,key){
+
+  const button=
+    document.getElementById(id);
+
+  const down=e=>{
+    e.preventDefault();
     keys[key]=true;
   };
 
-  const off=ev=>{
-    ev.preventDefault();
+  const up=e=>{
+    e.preventDefault();
     keys[key]=false;
   };
 
-  el.addEventListener("pointerdown",on);
-  el.addEventListener("pointerup",off);
-  el.addEventListener("pointercancel",off);
-  el.addEventListener("pointerleave",off);
+  button.addEventListener(
+    "pointerdown",
+    down
+  );
+
+  button.addEventListener(
+    "pointerup",
+    up
+  );
+
+  button.addEventListener(
+    "pointercancel",
+    up
+  );
+
+  button.addEventListener(
+    "pointerleave",
+    up
+  );
 }
 
-holdButton("up","up");
-holdButton("down","down");
-holdButton("left","left");
-holdButton("right","right");
+hold("up","up");
+hold("down","down");
+hold("left","left");
+hold("right","right");
 
 /* A */
-document.getElementById("btnA").addEventListener("pointerdown",e=>{
-  e.preventDefault();
-  attack();
-});
+document
+.getElementById("A")
+.addEventListener(
+  "pointerdown",
+  e=>{
+    e.preventDefault();
+
+    attack();
+  }
+);
 
 /* B */
-document.getElementById("btnB").addEventListener("pointerdown",e=>{
-  e.preventDefault();
+document
+.getElementById("B")
+.addEventListener(
+  "pointerdown",
+  e=>{
+    e.preventDefault();
 
-  if(state==="battle"){
-    usePotion();
-  }else{
-    closeScreen();
+    if(state==="battle"){
+
+      usePotion();
+
+    }else if(state==="inventory"){
+
+      state="world";
+
+    }else if(state==="shop"){
+
+      state="world";
+
+    }else if(state==="mission"){
+
+      state="world";
+    }
   }
-});
+);
 
-/* INVENTÁRIO */
-document.getElementById("inventoryBtn").addEventListener("pointerdown",e=>{
-  e.preventDefault();
-  openInventory();
-});
+/* I */
+document
+.getElementById("I")
+.addEventListener(
+  "pointerdown",
+  e=>{
+    e.preventDefault();
 
-/* INICIAR */
-canvas.addEventListener("pointerdown",()=>{
-  if(state==="menu") startGame();
-});
+    if(state==="world"){
+      state="inventory";
+    }
+  }
+);
 
-gameLoop();
+/* =========================
+   TECLADO
+========================= */
+
+document.addEventListener(
+  "keydown",
+  e=>{
+
+    const k=e.key.toLowerCase();
+
+    if(k==="w" || e.key==="ArrowUp")
+      keys.up=true;
+
+    if(k==="s" || e.key==="ArrowDown")
+      keys.down=true;
+
+    if(k==="a" || e.key==="ArrowLeft")
+      keys.left=true;
+
+    if(k==="d" || e.key==="ArrowRight")
+      keys.right=true;
+
+    if(e.key==="Enter")
+      attack();
+
+    if(k==="i" && state==="world")
+      state="inventory";
+
+    if(k==="l" && state==="world")
+      state="shop";
+
+    if(e.key==="Escape")
+      state="world";
+
+    if(k==="2")
+      specialAttack();
+
+    if(k==="3")
+      usePotion();
+  }
+);
+
+document.addEventListener(
+  "keyup",
+  e=>{
+
+    const k=e.key.toLowerCase();
+
+    if(k==="w" || e.key==="ArrowUp")
+      keys.up=false;
+
+    if(k==="s" || e.key==="ArrowDown")
+      keys.down=false;
+
+    if(k==="a" || e.key==="ArrowLeft")
+      keys.left=false;
+
+    if(k==="d" || e.key==="ArrowRight")
+      keys.right=false;
+  }
+);
+
+/* =========================
+   LOOP
+========================= */
+
+function loop(){
+
+  movePlayer();
+
+  if(messageTimer>0)
+    messageTimer--;
+
+  if(state==="menu")
+    drawMenu();
+
+  else if(state==="world")
+    drawWorld();
+
+  else if(state==="battle")
+    drawBattle();
+
+  else if(state==="inventory")
+    drawInventory();
+
+  else if(state==="mission")
+    drawMission();
+
+  else if(state==="shop")
+    drawShop();
+
+  requestAnimationFrame(loop);
+}
+
+/* =========================
+   COMEÇAR
+========================= */
+
+loadGame();
+
+loop();
+
 </script>
 
 </body>
